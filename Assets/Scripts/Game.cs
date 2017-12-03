@@ -19,6 +19,7 @@ namespace LD40
         public static float Timer;
         public static string LevelTitle;
         public static bool LevelCompleted = false;
+        public static string NextLevelTitle;
 
         public static int ALevelShots;
         public static float ALevelTime;
@@ -41,6 +42,16 @@ namespace LD40
         public static MenuManager GetMenuManager()
         {
             return GameObject.FindGameObjectWithTag("canvas").GetComponent<MenuManager>();
+        }
+
+        public static Controller GetController()
+        {
+            return GameObject.FindGameObjectWithTag("Tank").GetComponent<Controller>();
+        }
+
+        public static MiddleTextHandler GetMiddleText()
+        {
+            return GameObject.FindGameObjectWithTag("middle").GetComponent<MiddleTextHandler>();
         }
     }
 }

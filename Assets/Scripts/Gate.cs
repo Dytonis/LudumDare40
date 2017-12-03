@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gate : ResetableObject
+public class Gate : ManagedObject
 {
     public ParticleSystem system;
     public Vector3 offset;

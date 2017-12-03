@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace LD40.UI.Menus
 {
@@ -18,5 +19,19 @@ namespace LD40.UI.Menus
 
         public Transform GoodEmote;
         public Transform BadEmote;
+
+        public void Retry()
+        {
+            Game.GetController().flasher.FlashWin();
+            Game.GetController().StartReset();
+            Destroy(gameObject);
+        }
+
+        public void Next()
+        {
+            SceneManager.LoadScene(Game.NextLevelTitle, LoadSceneMode.Single);
+            Game.LevelCompleted = false;
+            Time.timeScale = 1;
+        }
     }
 }

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,7 +37,7 @@ namespace LD40.UI
             this.text = text;
         }
     }
-
+#if UNITY_EDITOR
     [UnityEditor.CustomEditor(typeof(TextDouble))]
     [CanEditMultipleObjects]
     public class TextDoubleEditor : UnityEditor.Editor
@@ -67,4 +69,5 @@ namespace LD40.UI
             }
         }
     }
+#endif
 }

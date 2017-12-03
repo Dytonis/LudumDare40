@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 namespace LD40
 {
-    public class Controller : MonoBehaviour
+    public class Controller : ManagedObject
     {
         public Camera playerCamera;
 
@@ -15,6 +15,7 @@ namespace LD40
         private float cd;
         public Projectile proj;
         public Rigidbody Shell;
+        public bool Godmode;
 
         public Transform SpawnLocation;
 
@@ -41,7 +42,7 @@ namespace LD40
                     cd = 0;
             }
 
-            if (!Exploded)
+            if (!Exploded && Game.LevelCompleted == false)
             {
                 CharacterMovement();
 
@@ -68,12 +69,23 @@ namespace LD40
                     Game.ShotsFired++;
                     Game.GetShotCounter().UpdateShots();
                     cd = cooldown;
+
+                    SendAll(OnShoot);
+                    if(Game.ShotsFired == 1)
+                        ThrowEvent(Event.OnFirstShot);
+                    ThrowEvent(Event.OnShoot);
                 }
                 else if (Input.GetMouseButtonDown(0))
                 {
                     Game.GetShotCounter().GetComponentInChildren<TextColorFlash>().FlashTextColor(Color.red, 0.25f);
                 }
             }
+        }
+
+        public void StartOnDeath()
+        {
+            SendAll(OnDeath);
+            ThrowEvent(Event.OnDeath);
         }
 
         public void OnTriggerEnter(Collider col)
@@ -94,6 +106,8 @@ namespace LD40
 
         public IEnumerator Fanfare()
         {
+            Godmode = true;
+
             EndScreenMenu menu = Game.GetMenuManager().Pop<EndScreenMenu>(); //this is why this is nice to do this <--
 
             //yield return new WaitForEndOfFrame();
@@ -110,6 +124,8 @@ namespace LD40
 
         public void DestroyProjectiles()
         {
+            transform.position = new Vector3(9999, 999, 9999); //for colliders
+
             for(int i = 0; i < Game.Projectiles.Count; i++)
             {
                 Destroy(Game.Projectiles[i]);
@@ -118,19 +134,24 @@ namespace LD40
             Game.Projectiles.Clear();
         }
 
-        public void Reset()
+        public void StartReset()
         {
             top.gameObject.SetActive(true);
             bottom.gameObject.SetActive(true);
             exploded.gameObject.SetActive(false);
             Exploded = false;
             Game.FreezeTrails = false;
+            Game.GetMiddleText().ClearQueue();
             velocity = Vector3.zero;
             transform.position = SpawnLocation.position;
 
             Game.ShotsFired = 0;
             Game.GetShotCounter().UpdateShots();
             Game.Timer = 0;
+            Game.LevelCompleted = false;
+            Time.timeScale = 1;
+            Game.GetMiddleText().Hide();
+            Godmode = false;
 
             GameObject[] debris = GameObject.FindGameObjectsWithTag("debris");
 
@@ -139,12 +160,7 @@ namespace LD40
                 Destroy(debris[i]);
             }
 
-            ResetableObject[] resets = GameObject.FindObjectsOfType<ResetableObject>();
-
-            foreach(ResetableObject obj in resets)
-            {
-                obj.Reset();
-            }
+            SendAll(Reset);
         }
 
         private void CharacterMovement()

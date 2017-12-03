@@ -10,9 +10,12 @@ namespace LD40.Levels
     {
         public int maxShots;
         public string LevelTitle;
+        public string NextLevelTile;
 
         public int ALevelShotCount;
         public float ALevelSeconds;
+
+        public Color BackgroundColor = Color.black;
 
         public void Start()
         {
@@ -21,6 +24,13 @@ namespace LD40.Levels
             Game.LevelTitle = LevelTitle;
             Game.ALevelShots = ALevelShotCount;
             Game.ALevelTime = ALevelSeconds;
+            Game.NextLevelTitle = NextLevelTile;
+            Game.Projectiles.Clear();
+            Game.GetController().flasher.FlashWin();
+
+            Camera.main.backgroundColor = BackgroundColor;
+
+            Game.GetController().StartReset();
         }
 
         public void Update()

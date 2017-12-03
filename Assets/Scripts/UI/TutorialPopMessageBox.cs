@@ -9,16 +9,16 @@ using UnityEngine.UI;
 namespace LD40.UI
 {
     [RequireComponent(typeof(BoxCollider))]
-    public class TutorialPopMessageBox : ResetableObject
+    public class TutorialPopMessageBox : ManagedObject
     {
         public string Message;
         public float Time;
-        public bool DisableTriggerOnHit;
-
-        public Text Fill; //dont break something that works
-        public Text BG;
+        public bool DisableTriggerOnExit;
+        public bool StayWhileIn;
+        public bool StayDisabled;
 
         private BoxCollider Trigger;
+        private bool timeout = false;
 
         public void Start()
         {
@@ -27,37 +27,39 @@ namespace LD40.UI
 
         public void OnTriggerEnter(Collider col)
         {
-            StopAllCoroutines();
-            StartCoroutine(PopMessage(Message, Time));
-            Trigger.enabled = !DisableTriggerOnHit;
+            if (col.tag == "Tank")
+            {
+                Game.GetMiddleText().AddToQueue(Message, Time, StayWhileIn);
+            }
         }
 
-        public IEnumerator PopMessage(string message, float time)
+        public void OnTriggerExit(Collider col)
         {
-            Fill.text = message;
-            BG.text = message;
-
-            Fill.color = Color.white;
-            BG.color = Color.black;
-
-            Fill.canvasRenderer.SetColor(Color.clear);
-            BG.canvasRenderer.SetColor(Color.clear);
-
-            Fill.CrossFadeColor(Color.white, 1, true, true);
-            BG.CrossFadeColor(Color.black, 1, true, true);
-
-            yield return new WaitForSecondsRealtime(time);
-
-            if (Fill.text != message)
-                yield break;
-
-            Fill.CrossFadeColor(Color.clear, 1, true, true);
-            BG.CrossFadeColor(Color.clear, 1, true, true);
+            if (timeout == false && col.tag == "Tank" && Game.GetController().Exploded == false)
+            {
+                Trigger.enabled = !DisableTriggerOnExit;
+                if (StayWhileIn)
+                {
+                    Game.GetMiddleText().ForceNextMessage();
+                }
+            }
         }
 
         public override void Reset()
         {
-            Trigger.enabled = true;
+            if (!StayDisabled)
+            {
+                Trigger.enabled = true;
+                //for any colliders that get disabled when we get moved out of them due to respawn
+                StartCoroutine(Timeout());
+            }
+        }
+
+        public IEnumerator Timeout()
+        {
+            timeout = true;
+            yield return new WaitForSecondsRealtime(0.15f);
+            timeout = false;
         }
     }
 }

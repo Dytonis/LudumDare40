@@ -57,7 +57,7 @@ public class Flasher : MonoBehaviour
 
     public void Reset()
     {
-        GameObject.FindGameObjectWithTag("Tank").GetComponent<Controller>().Reset();
+        GameObject.FindGameObjectWithTag("Tank").GetComponent<Controller>().StartReset();
     }
     public void DestroyProjectiles()
     {

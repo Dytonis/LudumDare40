@@ -5,12 +5,14 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class Target : ResetableObject
+public class Target : ManagedObject
 {
     public bool On;
 
     public override void Reset()
     {
+        base.Reset();
+
         On = false;
         gameObject.GetComponent<MeshRenderer>().enabled = true;
     }
@@ -26,7 +28,7 @@ public class Target : ResetableObject
         {
             foreach (GameObject p in Game.Projectiles)
             {
-                if (Vector3.Distance(transform.position, p.transform.position) < 2f)
+                if (Vector3.Distance(transform.position, p.transform.position) < 2.5f)
                 {
                     On = true;
                     gameObject.GetComponent<MeshRenderer>().enabled = false;

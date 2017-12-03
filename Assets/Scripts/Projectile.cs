@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-public class Projectile : ResetableObject
+public class Projectile : ManagedObject
 {
     public float Speed;
     public Controller Tank;
@@ -54,9 +53,10 @@ public class Projectile : ResetableObject
             {
                 if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(Tank.transform.position.x, 0, Tank.transform.position.z)) < 2)
                 {
-                    if (!Tank.Exploded)
+                    if (!Tank.Exploded && !Tank.Godmode)
                     {
                         Tank.Exploded = true;
+                        Tank.StartOnDeath();
                         Time.timeScale = 0.25f;
                         Game.FreezeTrails = true;
                         Tank.flasher.Flash();
