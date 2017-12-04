@@ -12,10 +12,13 @@ namespace LD40.Levels
         public string LevelTitle;
         public string NextLevelTile;
 
+        public bool OnlyTime;
+
         public int ALevelShotCount;
         public float ALevelSeconds;
 
         public Color BackgroundColor = Color.black;
+        public bool END;
 
         public void Start()
         {
@@ -26,9 +29,12 @@ namespace LD40.Levels
             Game.ALevelTime = ALevelSeconds;
             Game.NextLevelTitle = NextLevelTile;
             Game.Projectiles.Clear();
-            Game.GetController().flasher.FlashWin();
-
+            Game.GetFlasher().FlashWin();
+            Game.IsOnlyTime = OnlyTime;
+            Game.GetAudio().Flash.Play();
+            Game.TargetsHit = 0;
             Camera.main.backgroundColor = BackgroundColor;
+            Game.Demo = END;
 
             Game.GetController().StartReset();
         }

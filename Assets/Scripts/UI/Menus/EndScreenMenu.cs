@@ -22,8 +22,9 @@ namespace LD40.UI.Menus
 
         public void Retry()
         {
-            Game.GetController().flasher.FlashWin();
+            Game.GetFlasher().FlashWin();
             Game.GetController().StartReset();
+            Game.GetAudio().Flash.Play();
             Destroy(gameObject);
         }
 

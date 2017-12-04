@@ -1,4 +1,5 @@
 ﻿using LD40;
+using LD40.Events;
 using LD40.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ public class EventActivatedTextEditor : EventHandlerEditor
 
         EventActivatedText myScript = target as EventActivatedText;
 
-        if(myScript.TargetEvent != Event.None)
+        if(myScript.TargetEvent != ManagedEventType.None)
         {
             myScript.text = EditorGUILayout.TextArea(myScript.text, GUILayout.Height(60));
             myScript.time = EditorGUILayout.FloatField("Stay Time ", myScript.time);
@@ -50,13 +51,3 @@ public class EventActivatedTextEditor : EventHandlerEditor
     }
 }
 #endif
-
-public enum Event
-{
-    None,
-    OnDeath,
-    OnReset,
-    OnShoot,
-    OnFirstShot,
-    OnTargetDestroy,
-}

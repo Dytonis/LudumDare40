@@ -9,10 +9,12 @@ public class ParticleField : MonoBehaviour
     public Vector2 scaleRange;
     public float velocityRandomness;
     public int count;
-    public Transform center;
+    private Transform center;
 
     public void Start()
     {
+        center = Camera.main.transform;
+
         for(int i = 0; i < count; i++)
         {
             StarParticle part = Instantiate(prefab) as StarParticle;

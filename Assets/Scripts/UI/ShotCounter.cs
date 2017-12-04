@@ -13,9 +13,19 @@ namespace LD40.UI
 
         public void UpdateShots()
         {
-            foreach(Text t in Texts)
+            if (!Game.IsOnlyTime)
             {
-                t.text = "Shells fired: " + Game.ShotsFired + "/" + Game.ShotsMax;
+                foreach (Text t in Texts)
+                {
+                    t.text = "Shells fired: " + Game.ShotsFired + "/" + Game.ShotsMax;
+                }
+            }
+            else
+            {
+                foreach (Text t in Texts)
+                {
+                    t.text = "No shot score!";
+                }
             }
         }
     }

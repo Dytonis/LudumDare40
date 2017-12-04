@@ -14,15 +14,33 @@ namespace LD40
         public static List<GameObject> Projectiles = new List<GameObject>();
         public static List<Target> Targets = new List<Target>();
 
+        public static bool Demo;
+
+        public static int TargetsHit;
         public static int ShotsFired;
         public static int ShotsMax;
         public static float Timer;
+        public static bool IsOnlyTime;
         public static string LevelTitle;
         public static bool LevelCompleted = false;
         public static string NextLevelTitle;
 
         public static int ALevelShots;
         public static float ALevelTime;
+
+        public static void ForceProjectilesNewTarget()
+        {
+            foreach(GameObject o in Projectiles)
+            {
+                if(Vector3.Distance(o.GetComponent<Projectile>().target, o.transform.position) > 0.2f)
+                o.GetComponent<Projectile>().UpdateTargetInDirection();
+            }
+        }
+
+        public static Transform GetSpawn()
+        {
+            return GameObject.FindGameObjectWithTag("spawn").transform;
+        }
 
         public static ShotCounter GetShotCounter()
         {
@@ -52,6 +70,16 @@ namespace LD40
         public static MiddleTextHandler GetMiddleText()
         {
             return GameObject.FindGameObjectWithTag("middle").GetComponent<MiddleTextHandler>();
+        }
+
+        public static AudioManager GetAudio()
+        {
+            return GameObject.FindGameObjectWithTag("camerafollow").GetComponent<AudioManager>();
+        }
+
+        public static Flasher GetFlasher()
+        {
+            return GameObject.FindGameObjectWithTag("flasher").GetComponent<Flasher>();
         }
     }
 }

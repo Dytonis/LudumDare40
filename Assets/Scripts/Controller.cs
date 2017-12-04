@@ -1,4 +1,5 @@
-﻿using LD40.UI.Menus;
+﻿using LD40.Events;
+using LD40.UI.Menus;
 using LD40.VFX;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,12 +18,12 @@ namespace LD40
         public Rigidbody Shell;
         public bool Godmode;
 
-        public Transform SpawnLocation;
+        private Transform SpawnLocation;
 
         public bool Exploded = false;
 
         public Transform muzzle;
-        public Flasher flasher;
+        private Flasher flasher;
 
         public Transform top;
         public Transform bottom;
@@ -32,6 +33,12 @@ namespace LD40
         public float maxSpeed;
         public float acceleration;
         public float brake;
+
+        public void Start()
+        {
+            flasher = Game.GetFlasher();
+            SpawnLocation = Game.GetSpawn();
+        }
 
         public void Update()
         {
@@ -66,18 +73,23 @@ namespace LD40
                     r.AddForce(new Vector3(Random.Range(-500, 500), 500, Random.Range(-500, 500)));
                     r.angularVelocity = new Vector3(Random.Range(-500, 500), 5, Random.Range(-500, 500));
 
-                    Game.ShotsFired++;
-                    Game.GetShotCounter().UpdateShots();
+                    if (!Game.IsOnlyTime)
+                    {
+                        Game.ShotsFired++;
+                        Game.GetShotCounter().UpdateShots();
+                    }
+
                     cd = cooldown;
 
                     SendAll(OnShoot);
                     if(Game.ShotsFired == 1)
-                        ThrowEvent(Event.OnFirstShot);
-                    ThrowEvent(Event.OnShoot);
+                        ThrowEvent(ManagedEventType.OnFirstShot);
+                    ThrowEvent(ManagedEventType.OnShoot);
                 }
                 else if (Input.GetMouseButtonDown(0))
                 {
-                    Game.GetShotCounter().GetComponentInChildren<TextColorFlash>().FlashTextColor(Color.red, 0.25f);
+                    if(Game.IsOnlyTime == false)
+                        Game.GetShotCounter().GetComponentInChildren<TextColorFlash>().FlashTextColor(Color.red, 0.25f);
                 }
             }
         }
@@ -85,7 +97,21 @@ namespace LD40
         public void StartOnDeath()
         {
             SendAll(OnDeath);
-            ThrowEvent(Event.OnDeath);
+            ThrowEvent(ManagedEventType.OnDeath);
+            Game.GetAudio().Death.Play();
+            Game.GetAudio().Music.Stop();
+        }
+
+        public void Kill()
+        {
+            Exploded = true;
+            StartOnDeath();
+            Time.timeScale = 0.25f;
+            Game.FreezeTrails = true;
+            Game.GetFlasher().Flash();
+            top.gameObject.SetActive(false);
+            bottom.gameObject.SetActive(false);
+            exploded.gameObject.SetActive(true);
         }
 
         public void OnTriggerEnter(Collider col)
@@ -107,13 +133,21 @@ namespace LD40
         public IEnumerator Fanfare()
         {
             Godmode = true;
-
+            Game.GetAudio().Flash.Play();
+            Game.GetAudio().Music.Stop();
             EndScreenMenu menu = Game.GetMenuManager().Pop<EndScreenMenu>(); //this is why this is nice to do this <--
 
             //yield return new WaitForEndOfFrame();
 
             menu.Title.text = Game.LevelTitle;
-            menu.ShotText.text = "You fired " + Game.ShotsFired + (Game.ShotsFired == 1 ? " shot." : " shots");
+            if (Game.IsOnlyTime == false)
+            {
+                menu.ShotText.text = "You fired " + Game.ShotsFired + (Game.ShotsFired == 1 ? " shot." : " shots");
+            }
+            else
+            {
+                menu.ShotText.text = "Shot score not counted for this level.";
+            }
             menu.TimeText.text = "It took you " + Game.Timer.ToString("###,##0.00") + " seconds.";
             menu.LetterGrade.text = LetterGradeCalculator.GetGradeFromScore(Game.Timer, Game.ALevelTime, Game.ShotsFired, Game.ALevelShots).ToString();
 
@@ -136,6 +170,8 @@ namespace LD40
 
         public void StartReset()
         {
+            Start();
+
             top.gameObject.SetActive(true);
             bottom.gameObject.SetActive(true);
             exploded.gameObject.SetActive(false);
@@ -160,7 +196,9 @@ namespace LD40
                 Destroy(debris[i]);
             }
 
-            SendAll(Reset);
+            SendAll(OnReset);
+            if(Game.Demo == false)
+                Game.GetAudio().Music.Play();
         }
 
         private void CharacterMovement()

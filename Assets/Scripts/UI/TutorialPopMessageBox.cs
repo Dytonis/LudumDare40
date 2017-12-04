@@ -45,7 +45,7 @@ namespace LD40.UI
             }
         }
 
-        public override void Reset()
+        public override void OnReset()
         {
             if (!StayDisabled)
             {
